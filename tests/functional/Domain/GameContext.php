@@ -4,6 +4,7 @@ namespace CardBattleGame\Tests\Functional\Domain;
 
 use Assert\Assertion;
 use Behat\Behat\Context\Context;
+use CardBattleGame\Domain\Event\CardDealtForPlayerOnTurn;
 use CardBattleGame\Domain\Event\GameCreated;
 
 class GameContext implements Context
@@ -48,5 +49,18 @@ class GameContext implements Context
         $game = $this->eventSourcedContext->getAggregate();
 
         Assertion::same($game->getPlayerOnTurn()->getHitPoints(), (int) $hitPoints);
+    }
+
+    /**
+     * @Then player on turn has on hand card of type :type with value :value HP and cost of :cost MP
+     */
+    public function playerOnTurnHasOnHandCardOfTypeWithValueHpAndCostOfMp($type, $value, $cost)
+    {
+        /** @var ArrayIterator $persistedEventStream */
+        $persistedEventStream = iterator_to_array($this->eventSourcedContext->getPersistedEventStream());
+
+        $lastEvent = $persistedEventStream[count($persistedEventStream) - 1];
+
+        Assertion::isInstanceOf($lastEvent, CardDealtForPlayerOnTurn::class);
     }
 }

@@ -4,6 +4,8 @@ namespace CardBattleGame\Tests\Functional\Application;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Tester\Exception\PendingException;
+use CardBattleGame\Application\Command\DealCard;
+use CardBattleGame\Application\Command\DealCardHandler;
 use CardBattleGame\Tests\Functional\Domain\EventSourcedContextTrait;
 
 final class CardsDealingContext implements Context
@@ -20,18 +22,20 @@ final class CardsDealingContext implements Context
     }
 
     /**
-     * @When card of type :arg1 with value :arg2 HP and cost of :arg3 MP is dealt for player on turn
+     * @When card of type :type with value :value HP and cost of :cost MP is dealt for player on turn
      */
-    public function cardOfTypeWithValueHpAndCostOfMpIsDealtForPlayerOnTurn($arg1, $arg2, $arg3)
+    public function cardOfTypeWithValueHpAndCostOfMpIsDealtForPlayerOnTurn($type, $value, $cost)
     {
-        throw new PendingException();
-    }
+        $gameRepository = $this->eventSourcedContext->getGameRepository();
 
-    /**
-     * @Then player on turn has on hand card of type :arg1 with value :arg2 HP and cost of :arg3 MP
-     */
-    public function playerOnTurnHasOnHandCardOfTypeWithValueHpAndCostOfMp($arg1, $arg2, $arg3)
-    {
-        throw new PendingException();
+        $this->cqrsContext->getCommandRouter()
+            ->route(DealCard::class)
+            ->to(new DealCardHandler($gameRepository));
+
+        $gameId = $persistedEventStream = $this->eventSourcedContext->getAggregateId();
+
+        $this->cqrsContext->getCommandBus()->dispatch(
+            new DealCard($gameId, $type, $value, $cost)
+        );
     }
 }
