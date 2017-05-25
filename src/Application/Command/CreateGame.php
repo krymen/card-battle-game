@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace CardBattleGame\Application\Command;
 
-use Prooph\Common\Messaging\Command;
-
-final class CreateGame extends Command
+final class CreateGame
 {
     private $playerOnTurnName;
     private $playerWaitingName;
@@ -23,8 +21,6 @@ final class CreateGame extends Command
         $this->playerWaitingName = $playerWaitingName;
         $this->hitPointsPerPlayer = $hitPointsPerPlayer;
         $this->movePointsPerTurn = $movePointsPerTurn;
-
-        $this->init();
     }
 
     public function getPlayerOnTurnName(): string
@@ -45,23 +41,5 @@ final class CreateGame extends Command
     public function getMovePointsPerTurn(): int
     {
         return $this->movePointsPerTurn;
-    }
-
-    public function payload(): array
-    {
-        return [
-            'player-on-turn-name' => $this->getPlayerOnTurnName(),
-            'player-waiting-name' => $this->getPlayerWaitingName(),
-            'hit-points-per-player' => $this->getHitPointsPerPlayer(),
-            'move-points-per-turn' => $this->getMovePointsPerTurn(),
-        ];
-    }
-
-    protected function setPayload(array $payload): void
-    {
-        $this->playerOnTurnName = $payload['player-on-turn-name'];
-        $this->playerWaitingName = $payload['player-waiting-name'];
-        $this->hitPointsPerPlayer = $payload['hit-points-per-player'];
-        $this->movePointsPerTurn = $payload['move-points-per-turn'];
     }
 }
